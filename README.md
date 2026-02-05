@@ -1,116 +1,38 @@
-# Universal Lead Capture
-This repository contains an end-to-end lead capture and notification system built as part of the Gushwork assessment.  The solution demonstrates client-side scripting, data normalization, webhook-based automation, and conditional notifications using n8n.
-## 🚀 Features
+# 🚀 Universal AI Lead Engine
 
-•⁠  ⁠Universal JavaScript lead capture script (CMS-agnostic)
-•⁠  ⁠Lossless form data collection with semantic inference
-•⁠  ⁠Works with HTML, React, WordPress, and AJAX forms
-•⁠  ⁠Spam detection & lead status classification
-•⁠  ⁠Google Sheets / Airtable storage
-•⁠  ⁠Conditional email notifications
-•⁠  ⁠Manual review workflow for spam leads
+An end-to-end lead capture and notification ecosystem designed for fragmented CMS environments. This system utilizes a "Fuzzy" JS collector, n8n automation, and AI classification to ensure high-quality lead delivery.
+
+---
+
+### 🔗 Project Links
+* **Live Demo (Netlify):** [https://universal-lead-capture.netlify.app/](https://universal-lead-capture.netlify.app/)
+* **CRM (Google Sheets):** [CRM Link](https://docs.google.com/spreadsheets/d/1-4faIPJpvvAhq3rcBNUc1npDT7QyAeSej3US5VW6Zus/edit?gid=0#gid=0)
+
+---
+
+## 🛠 Features
+* **CMS-Agnostic Script:** Captures leads from HTML, React, WordPress, and Shopify using attribute-based fuzzy logic.
+* **AI Spam Filtration:** Integrates OpenAI via n8n to classify lead intent and filter bot submissions.
+* **Lossless Data Capture:** Automatically buckets non-standard form fields into metadata to prevent data loss.
+* **Human-in-the-loop Recovery:** Monitoring workflow triggers notifications if a "Spam" lead is manually marked as "New Lead" in the CRM.
 
 ---
 
 ## 📦 Project Structure
-
-
-
-src/ → Universal lead capture script
-public/ → Demo UI with realistic industry forms
-n8n/ → Workflow export & diagram
-docs/ → Implementation notes & edge cases
-
+* `src/` — Production-ready `lead-capture.js` with inline documentation.
+* `public/` — Industry-specific demo forms (Industrial, Real Estate, Funnels).
+* `n8n/` — Workflow JSON exports and architecture diagrams.
+* `docs/` — Deep-dive on spam logic, rollout strategy, and edge cases.
 
 ---
 
 ## 🧠 Part 1: Universal Lead Capture Script
+The script uses **Semantic Inference**. Instead of looking for specific IDs, it scans `name`, `id`, and `placeholder` attributes for keywords like *email*, *tel*, or *user*.
 
-File: ⁠ src/lead-capture.js ⁠
-
-### How it works
-•⁠  ⁠Listens to all ⁠ <form> ⁠ submissions
-•⁠  ⁠Normalizes field names using semantic inference
-•⁠  ⁠Preserves all raw fields for audit/debugging
-•⁠  ⁠Sends data to n8n webhook using ⁠ fetch ⁠ with ⁠ keepalive ⁠
-
-### Embed Example
-
-⁠ html
-<script
-  src="lead-capture.js"
-  data-customer-id="GW-DEMO-001"
-  data-endpoint="https://<your-n8n-domain>/webhook/lead-capture"
-  data-debug="true">
+**Quick Embed:**
+```html
+<script src="lead-capture.js"></script>
+<script>
+  // Handlers for UI success state
+  window.handleSuccess = () => { console.log("Lead captured!"); };
 </script>
-
-🔁 Part 2: n8n Automation Workflow
-
-Webhook receives normalized lead payload
-
-Spam detection logic applied
-
-Lead stored with status:
-
-New Lead
-
-Possible Spam
-
-Email notifications sent conditionally
-
-Status change watcher triggers delayed notifications
-
-Workflow export: n8n/workflow.json
-
-🧪 Local Development
-npm install
-npm run dev
-
-
-Mock webhook runs on:
-
-http://localhost:3001/webhook/lead-capture
-
-📄 Documentation
-
-docs/implementation.md
-
-docs/spam-logic.md
-
-docs/edge-cases.md
-
-🔮 Future Improvements
-
-CAPTCHA / honeypot integration
-
-Lead scoring with ML
-
-CRM integrations (HubSpot, Salesforce)
-
-Rate limiting & abuse protection
-
-
-This README alone can **carry your evaluation**.
-
----
-
-## 4️⃣ Git commands (exactly what to run)
-
-From the project root:
-
- ⁠bash
-git init
-git add .
-git commit -m "Initial commit: Universal lead capture & n8n automation"
-
-
-Create a repo on GitHub (name it something like):
-
-gushwork-lead-capture
-
-
-Then:
-
-git branch -M main
-git remote add origin https://github.com/<your-username>/gushwork-lead-capture.git
-git push -u origin main
