@@ -96,5 +96,5 @@
         await processSubmission(payload, 'btn-funnel');
     };
 
-    console.log("[LeadCapture] Production script loaded and listening for submissions.");
+    console.log("Lead Captured and sent to CRM.");
 })();
