@@ -4,7 +4,7 @@
  * Behavior: Fails silently for users (always shows success) but logs errors in console.
  */
 (function() {
-    const WEBHOOK_URL = 'https://animeshjhawar.app.n8n.cloud/webhook/lead-capture;
+    const WEBHOOK_URL = 'https://animeshjhawar.app.n8n.cloud/webhook/lead-capture';
     const CUSTOMER_ID = 'CLIENT-DE-01';
 
     /**
