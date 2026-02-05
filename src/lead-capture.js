@@ -1,119 +1,81 @@
 /**
- * Gushwork Universal Lead Capture v1.2
- * Production-ready script to intercept form submissions and sync to n8n.
+ * LeadCapture.js - Production Grade (External)
+ * Purpose: Intercepts form submissions and syncs with n8n Lead Engine.
  */
 (function() {
-    // --- CONFIGURATION ---
-    const CONFIG = {
-        webhookUrl: 'https://animeshjhawar.app.n8n.cloud/webhook-test/lead-capture',
-        customerId: 'CLIENT-DE-01',
-        debug: true // Set to false in final production
-    };
+    const WEBHOOK_URL = 'https://animeshjhawar.app.n8n.cloud/webhook-test/lead-capture';
+    const CUSTOMER_ID = 'CLIENT-DE-01';
 
-    /**
-     * Helper to log messages only if debug is enabled
-     */
-    const logger = (msg, data) => {
-        if (CONFIG.debug) console.log(`[LeadCapture] ${msg}`, data || '');
-    };
+    // Core transmission logic
+    async function processSubmission(payload, buttonId) {
+        const btn = document.getElementById(buttonId);
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+        }
 
-    /**
-     * Core function to ship data to the n8n Lead Engine
-     */
-    async function transmitLead(payload) {
         try {
-            const response = await fetch(CONFIG.webhookUrl, {
+            const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-            logger('Lead synced successfully');
-            return true;
-        } catch (err) {
-            console.error('[LeadCapture] Transmission failed:', err);
-            return false;
+            if (response.status === 200) {
+                console.log(`%c[n8n Status: 200] Flow Initiated.`, "color: green; font-weight: bold;");
+                // Trigger the UI change in the HTML
+                if (typeof window.handleSuccess === "function") window.handleSuccess();
+            } else {
+                alert("n8n Error: Status " + response.status);
+                if (btn) { btn.disabled = false; btn.innerText = "Try Again"; }
+            }
+        } catch (error) {
+            console.error('[Network Error]', error);
+            alert("Connection to n8n failed. Ensure the test webhook is active.");
+            if (btn) { btn.disabled = false; btn.innerText = "Submit"; }
         }
     }
 
-    /**
-     * 1. UNIVERSAL FORM LISTENER
-     * Listens for any <form> submission on the page.
-     */
-    document.addEventListener('submit', async function(event) {
-        const form = event.target;
-        
-        // Stop standard browser redirect/refresh
-        event.preventDefault();
-        logger('Intercepted form submission', form.id);
-
+    // Standard Form Interceptor
+    document.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
         const formData = new FormData(form);
         const signals = { name: [], email: [], phone: [], message: [] };
 
-        // Normalize fields into B2B categories
         for (let [name, value] of formData.entries()) {
-            const field = name.toLowerCase();
-            if (field.includes('name') || field.includes('person')) signals.name.push(value);
-            else if (field.includes('email')) signals.email.push(value);
-            else if (field.includes('phone') || field.includes('mobile') || field.includes('whatsapp')) signals.phone.push(value);
-            else if (value) signals.message.push(`${name}: ${value}`);
+            const lower = name.toLowerCase();
+            if (lower.includes('name') || lower.includes('person')) signals.name.push(value);
+            else if (lower.includes('email')) signals.email.push(value);
+            else if (lower.includes('phone') || lower.includes('mobile')) signals.phone.push(value);
+            else signals.message.push(`${name}: ${value}`);
         }
 
-        const payload = {
-            customer_id: CONFIG.customerId,
+        await processSubmission({
+            customer_id: CUSTOMER_ID,
             timestamp: new Date().toISOString(),
             source_url: window.location.href,
-            lead_source: {
-                referrer: document.referrer || "Direct",
-                utm_params: window.location.search || "None"
-            },
+            lead_source: { referrer: document.referrer || "Direct", utm_params: window.location.search || "None" },
             signals: signals
-        };
-
-        const success = await transmitLead(payload);
-        if (success) {
-            alert("Success! Your inquiry has been sent.");
-            form.reset();
-        }
+        }, `btn-${form.id}`);
     });
 
-    /**
-     * 2. CUSTOM FUNNEL OVERRIDE
-     * Hooks into the specific 'submitFunnel' function used in your demo.
-     */
+    // Funnel Logic (Exposed to Window)
     window.submitFunnel = async function() {
-        logger('Intercepted Funnel button click');
-
-        const signals = {
-            name: [
-                document.getElementById('firstName').value, 
-                document.getElementById('lastName').value
-            ],
-            phone: [document.getElementById('whatsapp').value],
-            message: [`Intent: ${document.getElementById('intent').value}`]
-        };
-
         const payload = {
-            customer_id: CONFIG.customerId,
+            customer_id: CUSTOMER_ID,
             timestamp: new Date().toISOString(),
-            source_url: window.location.href + "#react-funnel",
-            lead_source: {
-                referrer: document.referrer || "Internal Funnel",
-                utm_params: window.location.search || "None"
-            },
-            signals: signals
+            source_url: window.location.href + "#funnel",
+            lead_source: { referrer: "Internal Funnel", utm_params: window.location.search || "None" },
+            signals: {
+                name: [document.getElementById('funnelName').value],
+                email: [document.getElementById('funnelEmail').value],
+                phone: [document.getElementById('funnelWhatsapp').value],
+                message: ["Funnel Style Lead"]
+            }
         };
-
-        const success = await transmitLead(payload);
-        if (success) {
-            alert("Funnel Lead captured!");
-            // Clear fields manually
-            ['firstName', 'lastName', 'whatsapp', 'intent'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-        }
+        await processSubmission(payload, 'btn-funnel');
     };
 
-    logger('Initialized and watching for leads...');
+    console.log("[LeadCapture] Script loaded and listening.");
 })();
