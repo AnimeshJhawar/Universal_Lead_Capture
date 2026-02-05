@@ -1,0 +1,491 @@
+{
+  "name": "Lead Intake v0",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Trigger set to every one minute when status is changed in the sheet.",
+        "height": 80,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        752,
+        448
+      ],
+      "typeVersion": 1,
+      "id": "34088507-2f70-429e-9552-5fc9d2654519",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1-4faIPJpvvAhq3rcBNUc1npDT7QyAeSej3US5VW6Zus",
+          "mode": "list",
+          "cachedResultName": "Lead Intake Machine",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-4faIPJpvvAhq3rcBNUc1npDT7QyAeSej3US5VW6Zus/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Received Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-4faIPJpvvAhq3rcBNUc1npDT7QyAeSej3US5VW6Zus/edit#gid=0"
+        },
+        "event": "rowUpdate",
+        "options": {
+          "columnsToWatch": [
+            "Status"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        800,
+        288
+      ],
+      "id": "e299f6b6-7edf-4f90-86c4-40d424a32523",
+      "name": "Lead Change Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "E5oRkJSC0KTxsUfx",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "63ca79bb-e634-4bf7-a044-534e13b587ca",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "New Lead",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        288
+      ],
+      "id": "f8484216-c25b-4f1b-b9db-113757052b7e",
+      "name": "If lead type changed to \"New Lead\""
+    },
+    {
+      "parameters": {
+        "sendTo": "jhawaranimesh@gmail.com",
+        "subject": "=New Lead: {{ $json.Name }}",
+        "message": "=<!-- Email Body -->\n<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; color: #333; margin: 0; padding: 0;\">\n\n  <h2 style=\"margin-bottom: 5px;\">New Lead Alert</h2>\n  <p style=\"margin-top: 0; color: #555;\">{{ $json[\"Created at\"] }}</p>\n\n  <hr style=\"border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;\">\n\n  <p><strong>Name:</strong> {{ $json.Name }}</p>\n  <p><strong>Email:{{ $json[\"Email Address\"] }}</strong> \n    <a href=\"mailto:\" style=\"color: #2e7d32;\">\n      {{ $json[\"Email Address\"] }}\n    </a>\n  </p>\n  <p><strong>Phone:</strong> {{ $json[\"Phone Number\"] }}</p>\n  <p><strong>Category:</strong> {{ $json.Status }}</p>\n\n  <hr style=\"border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;\">\n\n  <p><strong>Message:</strong></p>\n  <p style=\"line-height: 1.6;\">{{ $json[\"Lead Details\"] }}</p>\n\n  <hr style=\"border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;\">\n\n  <p style=\"font-size: 13px; color: #555;\">\n    <strong>Source Details:</strong><br>\n    Referrer: {{ $json[\"Lead Source\"] }}<br>\n    Page URL: {{ $json[\"Submission URL\"] }}<br>\n    UTMs: {{ $json[\"Submission URL\"] }}\n  </p>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        48
+      ],
+      "id": "81b537d3-cc66-4629-9b84-23639fbb2ecf",
+      "name": "Send a message with lead information",
+      "webhookId": "93be9f16-4d32-4bdb-a804-23125a9f8bc5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TzGw32YyCdvQ239c",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6b233c40-2ce9-4f59-adb5-bc7b9a2508c1",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "New Lead",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "15b5c595-ebc4-4c99-9f9b-73951807c374",
+      "name": "If lead type is \"New Lead\""
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-4faIPJpvvAhq3rcBNUc1npDT7QyAeSej3US5VW6Zus/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Received Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email Address": "={{ $json.email }}",
+            "Created at": "={{ $json.created_at }}",
+            "Phone Number": "={{ $json.phone }}",
+            "Name": "={{ $json.name }}",
+            "Lead Details": "={{ $json.details }}",
+            "Updated at": "={{ $now }}",
+            "Customer Name": "={{ $json.customer }}",
+            "Status": "={{ $json.status }}",
+            "Submission URL": "={{ $json.submission_url }}",
+            "Lead Source": "={{ $json.lead_source }}"
+          },
+          "matchingColumns": [
+            "Email Address"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Details",
+              "displayName": "Lead Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Submission URL",
+              "displayName": "Submission URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Source",
+              "displayName": "Lead Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created at",
+              "displayName": "Created at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Updated at",
+              "displayName": "Updated at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        0
+      ],
+      "id": "cc9936e9-f4d0-4474-9f79-8f2edf5c214b",
+      "name": "Updating CRM with lead information",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "glmCCkTB7mNglJzv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// 1. Get raw data from Webhook (Modern Syntax)\nconst raw = $(\"Receiving information from webpage.\").first().json.body;\n\n// 2. Locate the AI text safely\nlet aiText = \"\";\ntry {\n    // Check for the 'output' array structure\n    const output = $(\"Lead Classifier \").first().json.output[0];\n    aiText = output.content[0].text;\n} catch (e) {\n    // Fallback if structure changes back to standard content\n    aiText = $(\"Lead Classifier \").first().json.content[0].text;\n}\n\n// 3. Clean and Parse AI Response\naiText = aiText.replace(/```json|```/g, \"\").trim();\nconst aiResponse = JSON.parse(aiText);\n\n// 4. Force Status & Handle Case Sensitivity\nconst rawStatus = aiResponse.status || aiResponse.Status || \"New Lead\";\nconst finalStatus = rawStatus.toLowerCase().includes(\"spam\") ? \"Possible Spam\" : \"New Lead\";\n\n// 5. Clean Phone (The ' prevents Google Sheets formula error)\nconst cleanPhone = raw.signals.phone[0] ? `'${raw.signals.phone[0]}` : \"No Phone\";\n\n// 6. Handle Timestamps for Google Sheets\nconst leadDate = raw.timestamp ? new Date(raw.timestamp) : new Date();\nconst sheetDate = leadDate.toISOString().replace('T', ' ').split('.')[0];\n\n// 7. Final Mapping\nreturn {\n  name: raw.signals.name.join(' ') || \"Unknown\",\n  email: raw.signals.email[0] || \"No Email\",\n  phone: cleanPhone,\n  details: raw.signals.message.join('\\n'),\n  status: finalStatus,\n  ai_reason: aiResponse.reason || aiResponse.Reason,\n  submission_url: raw.source_url,\n  lead_source: raw.lead_source?.referrer || \"Direct\",\n  utm_params: raw.lead_source?.utm_params || \"None\",\n  customer: raw.customer_id,\n  created_at: sheetDate,\n  formatted_time: leadDate.toLocaleString(),\n  updated_at: new Date().toISOString().replace('T', ' ').split('.')[0]\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        0
+      ],
+      "id": "f6eb597e-bb18-4cf6-8afa-7db55a8f7aa3",
+      "name": "Data Normalisation"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "Role: You are a B2B Lead Quality Analyst.\n\nTask: Classify lead data into a valid JSON object based on business intent.\n\nRules for \"New Lead\":\n\nPrimary Signal: The user is asking to buy, use, or learn more about the recipient's specific products or services.\n\nIntent: Requests for pricing, quotes, catalogs, technical specifications, or availability.\n\nB2B Context: Professional inquiries, even if brief or using personal emails (gmail/outlook), are legitimate business leads.\n\nWhitelisting: If the message mentions specific technical parts, industry-specific jargon, or project-based requirements, it is a New Lead.\n\nRules for \"Possible Spam\":\n\nSolicitation: The message is an attempt to sell to the business (e.g., selling SEO, backlinks, web development, HR services, or lead gen lists).\n\nVague/Automated: Generic \"Dear Admin\" or \"Dear Website Owner\" greetings with promises of \"ranking\" or \"traffic.\"\n\nTest Data: Email contains 'test', 'example', 'xyz', or 'placeholder'.\n\nCRITICAL OVERRIDE: > Do not confuse a customer asking for your marketing materials (catalogs/brochures) with a spammer offering their marketing services. If the user wants to give the business money, it is a New Lead.\n\nDefault: If unsure, classify as \"New Lead\".\n\nConstraint: Return ONLY valid JSON. No markdown, no backticks, no preamble.\n\nRequired Format: { \"status\": \"New Lead\", \"reason\": \"One short sentence explaining the intent found.\" }"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5a8c09c0-d046-4019-8120-d193cb3850ca",
+      "name": "Lead Classifier ",
+      "credentials": {
+        "openAiApi": {
+          "id": "rCYd5krzGdmsxo7x",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c8dcd878-1de6-4d84-8d51-055a6f718188",
+      "name": "Receiving information from webpage.",
+      "webhookId": "24217df5-21e3-4290-ac06-1d35e54ca364"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        240
+      ],
+      "id": "413e17aa-34a0-44b5-aa07-4ee5520cd583",
+      "name": "Close"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Change Trigger": {
+      "main": [
+        [
+          {
+            "node": "If lead type changed to \"New Lead\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If lead type changed to \"New Lead\"": {
+      "main": [
+        [
+          {
+            "node": "Send a message with lead information",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If lead type is \"New Lead\"": {
+      "main": [
+        [
+          {
+            "node": "Send a message with lead information",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Updating CRM with lead information": {
+      "main": [
+        [
+          {
+            "node": "If lead type is \"New Lead\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Normalisation": {
+      "main": [
+        [
+          {
+            "node": "Updating CRM with lead information",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Classifier ": {
+      "main": [
+        [
+          {
+            "node": "Data Normalisation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receiving information from webpage.": {
+      "main": [
+        [
+          {
+            "node": "Lead Classifier ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v0",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "Asia/Aden"
+  },
+  "versionId": "68a66bcf-82f7-4859-8c3a-e093ca34e90e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0aaebc457a970eba80e313498f35f8c96307a60fe22914b6e70cb4e1779f4883"
+  },
+  "id": "CcF2swZrACJSWuTOjA_wQ",
+  "tags": [
+    {
+      "name": "Gushwork",
+      "id": "URBmdBzpUN9LT0OC",
+      "updatedAt": "2026-02-04T15:54:12.873Z",
+      "createdAt": "2026-02-04T15:54:12.873Z"
+    }
+  ]
+}
