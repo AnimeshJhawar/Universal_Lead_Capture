@@ -1,1 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gushwork Lead Capture Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f8fafc, #eef2ff);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 700px;
+      padding: 32px;
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    p.subtitle {
+      margin: 0 0 24px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    select, input, textarea, button {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+
+    .form-section {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Gushwork Lead Capture Demo</h1>
+    <p class="subtitle">
+      Simulating real-world lead forms across different industries & frontends
+    </p>
+
+    <!-- FORM TYPE SELECTOR -->
+    <label for="formType">Select form scenario</label>
+    <select id="formType" onchange="switchForm()">
+      <option value="">-- Choose a scenario --</option>
+      <option value="rfq">Industrial Manufacturer RFQ</option>
+      <option value="service">Local Service Callback (WordPress)</option>
+      <option value="funnel">React / Click-based Funnel</option>
+    </select>
+
+    <!-- INDUSTRIAL RFQ FORM -->
+    <form class="form-section" id="rfq" action="https://animeshjhawar.app.n8n.cloud/webhook-test/lead-capture"
+ method="POST">
+      <label>Contact Person</label>
+      <input name="contact_person" required />
+
+      <label>Company Name</label>
+      <input name="company_name" />
+
+      <label>Phone / WhatsApp</label>
+      <input name="phone" />
+
+      <label>Machine Type</label>
+      <select name="machine_type">
+        <option>Injection Molding</option>
+        <option>CNC</option>
+        <option>Packaging</option>
+      </select>
+
+      <label>Monthly Requirement (Units)</label>
+      <input type="number" name="monthly_requirement" />
+
+      <label>Additional Notes</label>
+      <textarea name="notes"></textarea>
+
+      <button type="submit">Request Quotation</button>
+    </form>
+
+    <!-- LOCAL SERVICE FORM -->
+    <form class="form-section" id="service" action="http://localhost:3001/webhook" method="POST">
+      <label>Your Name</label>
+      <input name="name" />
+
+      <label>Mobile Number</label>
+      <input name="mobile_no" required />
+
+      <label>Preferred Callback Time</label>
+      <select name="callback_time">
+        <option>Morning</option>
+        <option>Afternoon</option>
+        <option>Evening</option>
+      </select>
+
+      <label>
+        <input type="checkbox" name="urgent" value="yes" />
+        Urgent callback required
+      </label>
+
+      <input type="hidden" name="utm_source" value="wordpress-site" />
+
+      <button type="submit">Request Callback</button>
+    </form>
+
+    <!-- REACT / FUNNEL STYLE FORM -->
+    <div class="form-section" id="funnel">
+      <label>First Name</label>
+      <input id="firstName" />
+
+      <label>Last Name</label>
+      <input id="lastName" />
+
+      <label>WhatsApp Number</label>
+      <input id="whatsapp" />
+
+      <label>What are you looking for?</label>
+      <textarea id="intent"></textarea>
+
+      <button onclick="submitFunnel()">Submit Lead</button>
+    </div>
+
+  </div>
+
+  <script>
+    function switchForm() {
+      document.querySelectorAll('.form-section').forEach(f => f.style.display = 'none');
+      const selected = document.getElementById('formType').value;
+      if (selected) {
+        document.getElementById(selected).style.display = 'block';
+      }
+    }
+
+    function submitFunnel() {
+      const payload = {
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        whatsapp: document.getElementById('whatsapp').value,
+        intent: document.getElementById('intent').value,
+        source: "react-funnel"
+      };
+
+      fetch("https://animeshjhawar.app.n8n.cloud/webhook-test/lead-capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      alert("Lead submitted!");
+    }
+  </script>
+
+</body>
+</html>
